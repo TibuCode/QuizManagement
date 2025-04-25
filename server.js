@@ -18,6 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Hiển thị biến môi trường để debug
+console.log('===== KHỞI ĐỘNG SERVER =====');
 console.log('Đang sử dụng CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
 console.log('Đang sử dụng CLIENT_SECRET:', process.env.GOOGLE_CLIENT_SECRET.substring(0, 5) + '...');
 
@@ -29,12 +30,21 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware để ghi log tất cả request
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Cấu hình session
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 1 ngày
+  }
 }));
 
 // Khởi tạo Passport
@@ -46,16 +56,25 @@ app.use('/api/auth', authRoutes);
 
 // Route mặc định
 app.get('/', (req, res) => {
-  res.send('API đang hoạt động');
+  res.send('API Quiz Management đang hoạt động! Sử dụng /api/auth/google để đăng nhập.');
 });
 
 // Xử lý lỗi
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Đã xảy ra lỗi server' });
+  console.error('Server error:', err.stack);
+  res.status(500).json({ 
+    message: 'Đã xảy ra lỗi server',
+    error: process.env.NODE_ENV === 'production' ? null : err.message
+  });
+});
+
+// Xử lý route không tồn tại
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route không tồn tại' });
 });
 
 // Khởi động server
 app.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
+  console.log(`Để đăng nhập với Google, truy cập: http://localhost:3001/login`);
 }); 

@@ -11,13 +11,17 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:5000/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
   try {
+    console.log('Google profile:', profile);
+    
     // Tìm hoặc tạo người dùng trong cơ sở dữ liệu của bạn
     // Đây là nơi bạn sẽ lưu thông tin người dùng từ Google
     const user = {
       googleId: profile.id,
       email: profile.emails[0].value,
       name: profile.displayName,
-      avatar: profile.photos[0].value
+      avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : null,
+      // Mặc định role là participant, có thể thay đổi trong cơ sở dữ liệu thực tế
+      role: 'participant'
     };
     
     // Trong một ứng dụng thực tế, bạn sẽ thêm logic để lưu vào cơ sở dữ liệu
@@ -25,6 +29,7 @@ passport.use(new GoogleStrategy({
     
     return done(null, user);
   } catch (error) {
+    console.error('Lỗi xác thực Google:', error);
     return done(error, null);
   }
 }));
@@ -47,15 +52,28 @@ router.get('/google',
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    // Tạo JWT token để client lưu trữ
-    const token = jwt.sign(
-      { id: req.user.googleId, email: req.user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-    
-    // Redirect về client với token
-    res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3001'}/auth/success?token=${token}`);
+    try {
+      // Tạo JWT token để client lưu trữ
+      const token = jwt.sign(
+        { 
+          id: req.user.googleId, 
+          email: req.user.email,
+          name: req.user.name,
+          avatar: req.user.avatar,
+          role: req.user.role
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' } // Thời gian token hợp lệ lâu hơn
+      );
+      
+      console.log('Đăng nhập thành công, chuyển hướng với token');
+      
+      // Redirect về client với token
+      res.redirect(`${process.env.CLIENT_URL || 'http://localhost:3001'}/auth/success?token=${token}`);
+    } catch (error) {
+      console.error('Lỗi khi tạo token:', error);
+      res.redirect('/login?error=authentication_failed');
+    }
   }
 );
 
@@ -71,6 +89,7 @@ router.get('/current-user', (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return res.json({ user: decoded });
   } catch (error) {
+    console.error('Lỗi xác thực token:', error);
     return res.status(401).json({ message: 'Token không hợp lệ' });
   }
 });

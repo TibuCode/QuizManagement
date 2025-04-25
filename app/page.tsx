@@ -1,45 +1,64 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { FcGoogle } from "react-icons/fc"
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-12 bg-gradient-to-b from-gray-200 to-gray-100">
-      <div className="container">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-800">Hệ Thống Quản Lý Trắc Nghiệm</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+      <header className="container mx-auto py-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Quiz Management</h1>
+        <Link href="/login">
+          <Button variant="outline" className="flex items-center gap-2">
+            <FcGoogle className="h-5 w-5" />
+            <span>Đăng nhập</span>
+          </Button>
+        </Link>
+      </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
-          <Card className="w-full border-gray-300 shadow-md transition-all duration-300 hover:shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-gray-300 to-gray-200 rounded-t-lg">
-              <CardTitle className="text-gray-800">Người Tham Gia</CardTitle>
-              <CardDescription className="text-gray-600">Làm bài trắc nghiệm và xem kết quả của bạn</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col space-y-4 pt-4 bg-white">
-              <p className="text-gray-600">Truy cập bài trắc nghiệm bằng liên kết hoặc mã được cung cấp bởi người tổ chức</p>
-            </CardContent>
-            <CardFooter className="bg-white">
-              <Link href="/login?role=participant" className="w-full">
-                <Button className="w-full bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-800 hover:to-gray-700 text-white transition-all">Đăng Nhập Như Người Tham Gia</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+      <main className="flex-1 flex flex-col items-center justify-center text-center container mx-auto px-4">
+        <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+          Hệ Thống Quản Lý Trắc Nghiệm
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl mb-8">
+          Nền tảng hiện đại giúp tạo, quản lý và làm bài trắc nghiệm dễ dàng với tính năng đăng nhập an toàn qua Google
+        </p>
 
-          <Card className="w-full border-gray-300 shadow-md transition-all duration-300 hover:shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-gray-300 to-gray-200 rounded-t-lg">
-              <CardTitle className="text-gray-800">Người Tổ Chức</CardTitle>
-              <CardDescription className="text-gray-600">Tạo và quản lý các bài trắc nghiệm</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col space-y-4 pt-4 bg-white">
-              <p className="text-gray-600">Tạo bài trắc nghiệm, quản lý người tham gia và xem kết quả</p>
-            </CardContent>
-            <CardFooter className="bg-white">
-              <Link href="/login?role=organizer" className="w-full">
-                <Button className="w-full bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-800 hover:to-gray-700 text-white transition-all">Đăng Nhập Như Người Tổ Chức</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link href="/login?role=organizer">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+              Tôi là Người Tổ Chức
+            </Button>
+          </Link>
+          <Link href="/login?role=participant">
+            <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
+              Tôi là Người Tham Gia
+            </Button>
+          </Link>
         </div>
-      </div>
+
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-xl font-semibold mb-2">Đăng nhập an toàn</h3>
+            <p className="text-gray-600">Sử dụng tài khoản Google để đăng nhập an toàn, không cần tạo tài khoản mới</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-xl font-semibold mb-2">Tạo trắc nghiệm dễ dàng</h3>
+            <p className="text-gray-600">Tạo và quản lý các bài trắc nghiệm với giao diện trực quan, dễ sử dụng</p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h3 className="text-xl font-semibold mb-2">Kết quả chi tiết</h3>
+            <p className="text-gray-600">Xem kết quả chi tiết và phân tích hiệu suất của các bài trắc nghiệm</p>
+          </div>
+        </div>
+      </main>
+
+      <footer className="py-6 bg-gray-50 mt-16">
+        <div className="container mx-auto px-4 text-center text-gray-500">
+          <p>&copy; {new Date().getFullYear()} Quiz Management. Hệ thống đăng nhập với Google.</p>
+        </div>
+      </footer>
     </div>
   )
 }
